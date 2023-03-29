@@ -1,0 +1,15 @@
+- name: "MySQL Database and Table"
+  hosts: localhost
+  become: yes
+  tasks:
+  - name: Create devx Database and users Table
+    ansible.builtin.shell: |
+      mysql -h devx-db-tf.ccfqzge8hspr.us-east-1.rds.amazonaws.com -P 3306 -u devops -pabcd1234 -e "CREATE DATABASE devx"
+
+      mysql -h devx-db-tf.ccfqzge8hspr.us-east-1.rds.amazonaws.com -P 3306 -u devops -pabcd1234 devx -e "CREATE TABLE users(username varchar(20), UID int, GID int, homedir varchar(20))"
+
+      mysql -h devx-db-tf.ccfqzge8hspr.us-east-1.rds.amazonaws.com -P 3306 -u devops -pabcd1234 devx -e "INSERT INTO users VALUES ('Otoi',1111,12121,'LA')"
+
+      mysql -h devx-db-tf.ccfqzge8hspr.us-east-1.rds.amazonaws.com -P 3306 -u devops -pabcd1234 devx -e "INSERT INTO users VALUES ('Bakai', 2222, 21212, 'NY')"
+
+      mysql -h devx-db-tf.ccfqzge8hspr.us-east-1.rds.amazonaws.com -P 3306 -u devops -pabcd1234 devx -e "INSERT INTO users VALUES ('Kubatbek', 3333, 12345, 'Tokio')"

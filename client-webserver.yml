@@ -1,0 +1,24 @@
+---
+- name: "cient-webserver"
+  hosts: clients
+  become: yes
+    #serial: 1 # the commands will run on instances 1 by 1 IF failed it won't proceed to the next EC2
+  tasks:
+    - name: "update cache"
+      yum:
+        update_cache: yes
+
+    - name: "Install apache"
+      yum:
+        name: httpd
+        state: present
+
+    - name: "Start Apache service" # systemctl start apache2 and systemctl enable apache2
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: "Hello world from {{ip address of EC2}}"
+      ansible.builtin.shell: echo "Hello World from $(curl http://169.254.169.254/latest/meta-data/instance-id)" > /var/www/html/index.html
+
