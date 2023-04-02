@@ -1,0 +1,24 @@
+---
+- name:  Create Users & Groups
+  hosts: clients
+  become: yes
+  tasks:
+    - name: Create group
+      group:
+        name: data
+
+    - name: Create users
+      user:
+        name: "{{ item.name }}"
+        password: "{{ item.password | string | password_hash('sha512', '8QtPsg') }}"
+      with_items:
+        - { name: john, uid: 2000, password: 12345678 }
+        - { name: davis, uid: 3000, password: 87654321 }
+
+    - name: Add users to group
+      user:
+        name: "{{ item }}"
+        groups: data
+      with_items:
+        - john
+        - davis
