@@ -44,19 +44,19 @@ resource "aws_instance" "EC2_lab" {
   }
 }
 
-resource "aws_ebs_volume" "lab_vol" {
-  availability_zone = "us-east-1b"
-  size              = 1
+# resource "aws_ebs_volume" "lab_vol" {
+#   availability_zone = "us-east-1b"
+#   size              = 1
 
-  tags = {
-    Name = "lab_vg"
-  }
-}
+#   tags = {
+#     Name = "lab_vg"
+#   }
+# }
 
-resource "aws_volume_attachment" "attach_demo_volume" {
-  device_name  = "/dev/sdc"
-  volume_id    = aws_ebs_volume.lab_vol.id
-  count        = length(var.public_subnet_cidrs)
-  instance_id  = element(aws_instance.EC2_lab[1].id, count.index)
-  skip_destroy = true
-}
+# resource "aws_volume_attachment" "attach_demo_volume" {
+#   device_name  = "/dev/sdc"
+#   volume_id    = aws_ebs_volume.lab_vol.id
+#   count        = length(var.public_subnet_cidrs)
+#   instance_id  = element(aws_instance.EC2_lab[1].id, count.index)
+#   skip_destroy = true
+# }

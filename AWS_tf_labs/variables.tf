@@ -23,11 +23,11 @@ variable "public_subnet_cidrs" {
   type = list(string)
 }
 
-variable "users" {
-  type = object({
-    name = list(string)
-    uid_number  = set(number)
-  })
-}
+# variable "users" {
+#   type = object({
+#     name = list(string)
+#     uid_number  = set(number)
+#   })
+# }
 
 

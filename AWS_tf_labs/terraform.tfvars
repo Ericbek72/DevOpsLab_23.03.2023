@@ -6,7 +6,7 @@ public_subnet_cidrs       = ["192.168.1.0/24", "192.168.2.0/24"]
 key_pair_name = "terraform_ec2_key"
 new_EC2       = "t2.micro"
 
-users = {
-  name = ["john", "davis"]
-  uid_number  = [2000, 3000]
-}
+# users = {
+#   name = ["john", "davis"]
+#   uid_number  = [2000, 3000]
+# }

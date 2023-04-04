@@ -13,54 +13,54 @@ resource "aws_iam_group" "data-users" {
   name = "data"
 }
 
-resource "aws_iam_user" "user-names" {
-  for_each = var.users
-  name     = each.value.name
-  # password = each.value.password
-  force_destroy = true
-  tags = {
-    uid = each.value.uid_number
-  }
-}
+# resource "aws_iam_user" "user-names" { # the task of the Lab is ASKING for LINUX users and NOT for IAM users
+#   for_each = var.users
+#   name     = each.value.name
+#   # password = each.value.password
+#   force_destroy = true
+#   tags = {
+#     uid = each.value.uid_number
+#   }
+# }
 
-resource "aws_iam_user_login_profile" "data-users-keys" {
-  for_each = var.users
-  #user     = each.value.name
-  user = aws_iam_user.user-names[each.value].name
-}
+# resource "aws_iam_user_login_profile" "data-users-keys" {
+#   for_each = var.users
+#   #user     = each.value.name #we CANNOT explicitely set a password value using a password attribute 
+#   user = aws_iam_user.user-names[each.value].name
+# }
 
-resource "aws_iam_user_group_membership" "data-users-member" {
-  for_each = var.users
-  user     = aws_iam_user.user-names[each.value].name
-  groups = [
-    aws_iam_group.data-users.name
-  ]
-}
+# resource "aws_iam_user_group_membership" "data-users-member" {
+#   for_each = var.users
+#   user     = aws_iam_user.user-names[each.value].name
+#   groups = [
+#     aws_iam_group.data-users.name
+#   ]
+# }
 
 
-output "password" {
-  value = { for k, v in aws_iam_user_login_profile.data-users-keys : k => v.encrypted_password }
-}
+# output "password" {
+#   value = { for k, v in aws_iam_user_login_profile.data-users-keys : k => v.encrypted_password }
+# }
 
-resource "aws_iam_user_policy" "newemp_policy" {
-  count  = length(var.users)
-  name   = "new_iam_policy"
-  user   = element(var.users[*], count.index)
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:Describe*"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-}
+# resource "aws_iam_user_policy" "newemp_policy" {
+#   count  = length(var.users)
+#   name   = "new_iam_policy"
+#   user   = element(var.users[*], count.index)
+#   policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Action": [
+#         "ec2:Describe*"
+#       ],
+#       "Resource": "*"
+#     }
+#   ]
+# }
+# EOF
+# }
 
 module "iam_group" {
   source      = "../iam_modules"
