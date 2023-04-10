@@ -20,8 +20,8 @@ resource "aws_internet_gateway" "vpc-gateway" {
 resource "aws_subnet" "public_subnets" {
   count             = length(var.public_subnet_cidrs)
   vpc_id            = aws_vpc.lab-vpc.id
-  cidr_block        = element(var.public_subnet_cidrs, count.index)
-  availability_zone = element(var.availability_zones_public, count.index)
+  cidr_block        = var.public_subnet_cidrs[count.index] #or element(var.public_subnet_cidrs, count.index)
+  availability_zone = var.availability_zones_public[count.index] #or availability_zone = element(var.availability_zones_public, count.index)
   tags = {
     Name  = "VPC Public Subnet ${count.index + 1}"
     Owner = "erkin"

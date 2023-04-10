@@ -17,7 +17,7 @@ resource "local_file" "tf_ec2_private_key_file" {
   filename = "tf_ec2_private_key.pem"
 }
 
-data "aws_ami" "amazon-EC2-apache" {
+/*data "aws_ami" "amazon-EC2-apache" {
 
   owners = ["self"]
 
@@ -25,15 +25,15 @@ data "aws_ami" "amazon-EC2-apache" {
     name   = "name"
     values = ["*Apache*"]
   }
-}
+}*/
 
 
 # Create a EC2 instance
 resource "aws_instance" "EC2_lab" {
-  ami           = data.aws_ami.amazon-EC2-apache.id
+  ami           = "ami-00c39f71452c08778"
   instance_type = var.new_EC2
   key_name      = aws_key_pair.tf_ec2_public_key.id
-  count         = 2
+  count         = length(var.public_subnet_cidrs)
   subnet_id     = element(aws_subnet.public_subnets[*].id, count.index)
 
   associate_public_ip_address = true
@@ -42,6 +42,20 @@ resource "aws_instance" "EC2_lab" {
     Name  = "EC2 for VPC ${count.index + 1}"
     Owner = "erkin"
   }
+}
+
+resource "aws_ebs_volume" "demo_volume" {
+  size              = 1
+  count         = length(var.public_subnet_cidrs)
+  availability_zone = var.availability_zones_public[0]
+  type              = "standard"
+}
+resource "aws_volume_attachment" "attach_demo_volume" {
+  count             = length(var.public_subnet_cidrs)
+  device_name  = "/dev/sdb"
+  volume_id    = aws_ebs_volume.demo_volume[0].id
+  instance_id  = aws_instance.EC2_lab[0].id
+  skip_destroy = true
 }
 
 # resource "aws_ebs_volume" "lab_vol" {
