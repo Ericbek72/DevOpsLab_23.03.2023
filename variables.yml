@@ -1,0 +1,74 @@
+---
+lvm_config:
+    pvs:
+      - /dev/xvdb
+    vgs:
+        vg_devx:
+            pvs:
+                - /dev/xvdb
+    lvs:
+        - name: lv_xfs
+          vg: vg_devx
+          size: 100M
+        - name: lv_swap
+          vg: vg_devx
+          size: 200M
+        - name: lv_data
+          vg: vg_devx
+          size: "+20%FREE"
+
+filesystems_config:  
+    xfs:
+        dev: /dev/vg_devx/lv_xfs
+        type: xfs
+        opts: ''
+        
+    data:
+        dev: /dev/vg_devx/lv_data
+        type: ext4
+        opts: ''
+
+swap_config:
+    swap:
+        dev: /dev/vg_devx/lv_swap
+        type: swap
+        opts: 'sw'
+          
+mounts_config:
+    xfs:
+        dev: /dev/vg_devx/lv_xfs
+        fstype: xfs
+        opts: 'noatime,nodiratime'
+        mountpoint: /mnt/xfs
+        dump: '0'
+        passno: '2'
+        state: mounted
+          #swap:
+          #dev: /dev/vg_devx/lv_swap
+          #fstype: swap
+          #opts: 'sw'
+          #mountpoint: /mnt/swap
+          #dump: '0'
+          #passno: '0'
+          #state: mounted
+    data:
+        dev: /dev/vg_devx/lv_data
+        fstype: ext4
+        opts: 'noatime,nodiratime'
+        mountpoint: /mnt/data
+        dump: '0'
+        passno: '2'
+        state: mounted
+
+fstab_entries:
+  - key: swap
+    value:
+      dev: /dev/vg_devx/lv_swap
+      fstype: swap
+      opts: 'defaults'
+      dump: '0'
+      passno: '0'
+      state: 'present'
+...
+
+

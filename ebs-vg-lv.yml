@@ -1,0 +1,72 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: localhost
+  user: ec2-user
+  become: true
+  vars_files:
+    - variables.yml
+  tasks:
+    - name: Create demo directories
+      file:
+        state: directory
+        path: "/mnt/{{ item }}"
+      with_items:
+        - xfs
+        - swap
+        - data
+        
+    - name: Creating volume groups
+      lvg:
+        vg: "{{ item.key }}" #vg_devx
+        pvs: "{{ item.value.pvs|join(',') }}" #/dev/xvdb
+        state: present
+      with_dict: "{{ lvm_config['vgs'] }}"
+      tags:
+        - lvm
+
+    - name: Creating/extending logical volumes
+      lvol:
+        lv: "{{ item.name }}"
+        vg: "{{ item.vg }}" #vg_devx
+        size: "{{ item.size }}"
+        opts: "{{ item.opts|default('') }}"
+        state: present
+      with_items: "{{ lvm_config['lvs'] }}"
+      tags:
+        - lvm
+        - resizefs
+
+    - name: Format filesystems
+      filesystem:
+        dev: "{{ item.value.dev }}"
+        fstype: "{{ item.value.type }}"
+        opts: "{{ item.value.opts }}"
+        resizefs: yes
+      with_dict: "{{ filesystems_config }}"
+      tags:
+        - filesystems
+        - resizefs
+
+    - name: Format swap space    
+      filesystem:
+        dev: "{{ item.value.dev }}"
+        fstype: "{{ item.value.type }}"
+        opts: "{{ item.value.opts }}"
+      with_dict: "{{ swap_config }}"
+
+    - name: Mount filesystems
+      mount:
+        src: "{{ item.value.dev }}"
+        name: "{{ item.value.mountpoint }}"
+        opts: "{{ item.value.opts }}"
+        fstype: "{{ item.value.fstype }}"
+        state: "{{ item.value.state }}"
+        passno: "{{ item.value.passno }}"
+        dump: "{{ item.value.dump }}"
+      with_dict: "{{ mounts_config }}"
+      tags:
+        - mounts
+   
+    - name: Activate swap space
+      command: swapon /dev/vg_devx/lv_swap
+...
